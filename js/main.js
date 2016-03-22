@@ -1,14 +1,14 @@
 (function ($) {
     var data;
+    var answer;
 
     $(document).ready(function () {
 
         $.ajax({
-                url: 'tasks.json',
-                cache: false,
-                dataType: 'json'
-            })
-            .done(function (json) {
+            url: 'tasks.json',
+            cache: false,
+            dataType: 'json',
+            success: (function (json) {
 
                 data = json;
 
@@ -18,24 +18,22 @@
                         $('#list-of-tasks').append(html);
                     }
                     else {
-                        var html = '<li class="task completed"><input type="checkbox" class="check"  id="' + element.id + '" checked="checked">' + element.task + '</li>';
-                        $('#list-of-tasks').append(html);
+                        var html_complete = '<li class="task completed"><input type="checkbox" class="check"  id="' + element.id + '" checked="checked">' + element.task + '</li>';
+                        $('#list-of-tasks').append(html_complete);
                     }
                 });
 
                 completeTask();
-            });
+            })
+
+        });
 
 
         $('#add-new-btn').click(function () {
-
+            var jsonObj;
             var value = $('#new-task').val();
             var spaces = /^\s+$/;
             if (value != '' || value != spaces.test(value)) {
-                if (data == undefined) {
-                    data = [];
-                }
-                ;
 
                 jsonObj = {
                     id: data.length + 1,
@@ -45,7 +43,7 @@
 
                 data.push(jsonObj);
 
-                jsonString = 'task=' + JSON.stringify(data);
+                answer = 'task=' + JSON.stringify(data);
 
 
                 var html = '<li class="task"><input type="checkbox" class="check" id="' + jsonObj.id + '">' + value + '</li>';
@@ -62,7 +60,7 @@
         $('#remove-btn').click(function () {
             data = [];
             console.log(data);
-            jsonString = 'task=' + JSON.stringify(data);
+            answer = 'task=' + JSON.stringify(data);
             $('#list-of-tasks li').remove();
             rewriteJson();
         });
@@ -73,7 +71,7 @@
         $.ajax({
             type: "GET",
             url: "script.php",
-            data: jsonString,
+            data: answer,
             dataType: "json"
         });
     }
@@ -89,7 +87,7 @@
                     if ($(this).attr('id') == data[item].id) {
 
                         data[item].status = 'complete';
-                        jsonString = 'task=' + JSON.stringify(data);
+                        answer = 'task=' + JSON.stringify(data);
                         console.log(data[item].status);
 
                         rewriteJson();
@@ -104,7 +102,7 @@
 
                     if ($(this).attr('id') == data[itemst].id) {
                         data[itemst].status = 'new';
-                        jsonString = 'task=' + JSON.stringify(data);
+                        answer = 'task=' + JSON.stringify(data);
                         console.log(data[itemst].status);
 
                         rewriteJson();
